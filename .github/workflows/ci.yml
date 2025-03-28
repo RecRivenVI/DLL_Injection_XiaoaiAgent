@@ -1,15 +1,12 @@
-name: CI for Windows with GCC and CMake
+name: CI and Release for Windows with GCC and CMake
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    tags:
+      - 'v*' # 当推送带有 "v" 前缀的标签时触发，例如 v1.0.0
 
 jobs:
-  build:
+  build-and-release:
     runs-on: windows-latest
 
     steps:
@@ -53,8 +50,32 @@ jobs:
           cd build
           mingw32-make
 
-      # 运行测试（可选）
-      - name: Run tests
+      # 打包编译结果
+      - name: Package build artifacts
         run: |
           cd build
-          ctest
+          zip -r ../release.zip ./*
+
+      # 创建 Release
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      # 上传编译结果到 Release
+      - name: Upload Release Asset
+        id: upload_release_asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./release.zip
+          asset_name: release.zip
+          asset_content_type: application/zip
