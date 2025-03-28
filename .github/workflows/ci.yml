@@ -57,7 +57,7 @@ jobs:
       - name: Package executable
         run: |
           cd build
-          cp your_executable.exe ../release/
+          cp DLL_Injection_XiaoaiAgent.exe ../release/
         shell: bash
 
       # 创建 Release
