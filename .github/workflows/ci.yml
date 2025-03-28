@@ -1,9 +1,12 @@
-name: CI and Release for Windows with GCC and CMake
+name: Build and Release Windows Executable
 
 on:
-  push:
-    tags:
-      - 'v*' # 当推送带有 "v" 前缀的标签时触发，例如 v1.0.0
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
 
 jobs:
   build-and-release:
@@ -50,32 +53,30 @@ jobs:
           cd build
           mingw32-make
 
-      # 打包编译结果
-      - name: Package build artifacts
+      # 打包生成的 .exe 文件
+      - name: Package executable
         run: |
           cd build
-          zip -r ../release.zip ./*
+          cp your_executable.exe ../release/
+        shell: bash
 
       # 创建 Release
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ github.event.inputs.release_tag }}
+          release_name: Release ${{ github.event.inputs.release_tag }}
           draft: false
           prerelease: false
-
-      # 上传编译结果到 Release
-      - name: Upload Release Asset
-        id: upload_release_asset
-        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 上传 .exe 文件到 Release
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./release.zip
-          asset_name: release.zip
-          asset_content_type: application/zip
+          asset_path: ./release/your_executable.exe
+          asset_name: your_executable.exe
+          asset_content_type: application/octet-stream
