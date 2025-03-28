@@ -35,13 +35,13 @@ jobs:
           gcc --version
           cmake --version
 
-      - name: Configure CMake
+      - name: Configure CMake for static linking
         run: |
           mkdir build
           cd build
-          cmake .. -G "MinGW Makefiles"
+          cmake .. -G "MinGW Makefiles" -DCMAKE_EXE_LINKER_FLAGS="-static"
 
-      - name: Build project
+      - name: Build project statically
         run: |
           cd build
           mingw32-make
@@ -51,7 +51,6 @@ jobs:
           cd build
           mkdir -p ../release
           cp DLL_Injection_XiaoaiAgent.exe ../release/
-        shell: bash
 
       - name: Delete existing release tag if it exists
         id: delete_existing_release
