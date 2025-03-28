@@ -53,8 +53,18 @@ jobs:
           cp DLL_Injection_XiaoaiAgent.exe ../release/
         shell: bash
 
+      - name: Check if Release Tag Exists
+        id: check_tag
+        run: |
+          if git rev-parse ${{ github.event.inputs.release_tag }} >/dev/null 2>&1; then
+            echo "tag_exists=true" >> $GITHUB_ENV
+          else
+            echo "tag_exists=false" >> $GITHUB_ENV
+          fi
+
       - name: Create Release
         id: create_release
+        if: env.tag_exists == 'false'
         uses: actions/create-release@v1
         with:
           tag_name: ${{ github.event.inputs.release_tag }}
@@ -64,10 +74,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}  # Use PAT instead of default GITHUB_TOKEN
 
+      - name: Update Release
+        id: update_release
+        if: env.tag_exists == 'true'
+        run: |
+          echo "The release tag already exists. Updating the existing release."
+
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url || steps.update_release.outputs.upload_url }}
           asset_path: ./release/DLL_Injection_XiaoaiAgent.exe
           asset_name: DLL_Injection_XiaoaiAgent.exe
           asset_content_type: application/octet-stream
