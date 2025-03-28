@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up CMake
+      uses: lukka/setup-cmake@v1
+      with:
+        cmake-version: '3.25'
+
+    - name: Install Visual Studio Build Tools
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Create Build Directory
+      run: |
+        mkdir build
+        cd build
+        
+    - name: Configure CMake
+      working-directory: ./build
+      run: cmake ..
+
+    - name: Build Project
+      working-directory: ./build
+      run: cmake --build .
+
+
+
