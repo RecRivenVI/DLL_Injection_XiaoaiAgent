@@ -12,25 +12,39 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y cmake g++ make
+    # 安装 Visual Studio Build Tools
+    - name: Install Visual Studio Build Tools
+      uses: microsoft/setup-msbuild@v1.0.2
 
+    # 安装 CMake
+    - name: Install CMake
+      uses: lukka/get-cmake@v3
+
+    # 创建构建目录
     - name: Create build directory
-      run: mkdir build && cd build
+      run: mkdir build
 
-    - name: Configure with CMake
+    # 配置 CMake
+    - name: Configure CMake
       working-directory: build
       run: cmake ..
 
+    # 编译项目
     - name: Build project
       working-directory: build
       run: cmake --build .
 
-    - name: Run tests (if any)
+    # 运行测试（如果有的话）
+    - name: Run tests
       working-directory: build
-      run: ctest || true  # 如果没有测试，可以跳过这一步或注释掉
+      run: |
+        # 添加运行测试的命令
+        # 例如：
+        # .\Release\DLL_Injection_XiaoaiAgent.exe
+        if exist Release\DLL_Injection_XiaoaiAgent.exe (
+          Release\DLL_Injection_XiaoaiAgent.exe
+        ) else if exist Debug\DLL_Injection_XiaoaiAgent.exe (
+          Debug\DLL_Injection_XiaoaiAgent.exe
+        )
