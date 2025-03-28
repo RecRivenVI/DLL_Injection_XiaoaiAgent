@@ -1,0 +1,60 @@
+name: CI for Windows with GCC and CMake
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      # 检出代码
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 安装 Chocolatey 包管理器
+      - name: Install Chocolatey
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+      # 使用 Chocolatey 安装 MinGW-w64 和 CMake
+      - name: Install MinGW-w64 and CMake
+        run: |
+          choco install mingw -y
+          choco install cmake -y
+
+      # 设置环境变量
+      - name: Add MinGW to PATH
+        run: |
+          echo "C:\ProgramData\chocolatey\bin" >> $env:GITHUB_PATH
+          echo "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin" >> $env:GITHUB_PATH
+
+      # 验证 GCC 和 CMake 是否安装成功
+      - name: Verify GCC and CMake installation
+        run: |
+          gcc --version
+          cmake --version
+
+      # 创建构建目录并运行 CMake
+      - name: Configure CMake
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G "MinGW Makefiles"
+
+      # 构建项目
+      - name: Build project
+        run: |
+          cd build
+          mingw32-make
+
+      # 运行测试（可选）
+      - name: Run tests
+        run: |
+          cd build
+          ctest
