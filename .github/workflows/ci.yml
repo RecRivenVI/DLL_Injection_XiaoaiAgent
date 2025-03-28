@@ -27,8 +27,8 @@ jobs:
 
       - name: Add MinGW to PATH
         run: |
-          $env:Path += ";C:\ProgramData\chocolatey\bin"
-          $env:Path += ";C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin"
+          echo "C:\ProgramData\chocolatey\bin" >> $env:GITHUB_PATH
+          echo "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin" >> $env:GITHUB_PATH
 
       - name: Verify GCC and CMake installation
         run: |
@@ -50,22 +50,16 @@ jobs:
         run: |
           cd build
           mkdir -p ../release
-          Copy-Item DLL_Injection_XiaoaiAgent.exe ../release/
+          cp DLL_Injection_XiaoaiAgent.exe ../release/
+        shell: bash
 
-      - name: Check if release tag exists
-        id: check_release
+      - name: Delete existing release tag if it exists
+        id: delete_existing_release
         run: |
-          try {
-            Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ github.event.inputs.release_tag }}" -Method HEAD -StatusCodeVariable statusCode
-            if ($statusCode -eq 200) {
-              Write-Output "##[set-output name=exists]true"
-            }
-          } catch {
-            Write-Output "##[set-output name=exists]false"
-          }
+          git push origin :refs/tags/${{ github.event.inputs.release_tag }} || true
+        continue-on-error: true
 
       - name: Create Release
-        if: steps.check_release.outputs.exists == 'false'
         id: create_release
         uses: actions/create-release@v1
         with:
@@ -76,26 +70,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}  # Use PAT instead of default GITHUB_TOKEN
 
-      - name: Update Release
-        if: steps.check_release.outputs.exists == 'true'
-        id: update_release
-        uses: octokit/request-action@v5.x
-        with:
-          route: PATCH /repos/${{ github.repository }}/releases/tags/${{ github.event.inputs.release_tag }}
-          data: |
-            {
-              "draft": false,
-              "prerelease": false
-            }
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
-
       - name: Upload Release Asset
-        needs: [create_release, update_release]
-        if: always()
         uses: actions/upload-release-asset@v1
         with:
-          upload_url: ${{ needs.create_release.outputs.upload_url || needs.update_release.data.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./release/DLL_Injection_XiaoaiAgent.exe
           asset_name: DLL_Injection_XiaoaiAgent.exe
           asset_content_type: application/octet-stream
