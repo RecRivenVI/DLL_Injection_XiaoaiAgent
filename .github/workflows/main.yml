@@ -15,7 +15,7 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Set up CMake
-      uses: Kitware/CMake@v1
+      uses: Kitware/CMake@v3.21.1  # Specify a more specific version
       with:
         cmake-version: '3.25'
 
@@ -26,7 +26,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        
+
     - name: Configure CMake
       working-directory: ./build
       run: cmake ..
@@ -34,6 +34,3 @@ jobs:
     - name: Build Project
       working-directory: ./build
       run: cmake --build .
-
-
-
