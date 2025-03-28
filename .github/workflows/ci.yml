@@ -13,47 +13,39 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      # 检出代码
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 安装 Chocolatey 包管理器
       - name: Install Chocolatey
         run: |
-          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
-      # 使用 Chocolatey 安装 MinGW-w64 和 CMake
       - name: Install MinGW-w64 and CMake
         run: |
           choco install mingw -y
           choco install cmake -y
 
-      # 设置环境变量
       - name: Add MinGW to PATH
         run: |
           echo "C:\ProgramData\chocolatey\bin" >> $env:GITHUB_PATH
           echo "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin" >> $env:GITHUB_PATH
 
-      # 验证 GCC 和 CMake 是否安装成功
       - name: Verify GCC and CMake installation
         run: |
           gcc --version
           cmake --version
 
-      # 创建构建目录并运行 CMake
       - name: Configure CMake
         run: |
           mkdir build
           cd build
           cmake .. -G "MinGW Makefiles"
 
-      # 构建项目
       - name: Build project
         run: |
           cd build
           mingw32-make
 
-      # 打包生成的 .exe 文件
       - name: Package executable
         run: |
           cd build
@@ -61,7 +53,6 @@ jobs:
           cp DLL_Injection_XiaoaiAgent.exe ../release/
         shell: bash
 
-      # 创建 Release
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -71,9 +62,8 @@ jobs:
           draft: false
           prerelease: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}  # Use PAT instead of default GITHUB_TOKEN
 
-      # 上传 .exe 文件到 Release
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         with:
@@ -81,3 +71,5 @@ jobs:
           asset_path: ./release/DLL_Injection_XiaoaiAgent.exe
           asset_name: DLL_Injection_XiaoaiAgent.exe
           asset_content_type: application/octet-stream
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}  # Use PAT instead of default GITHUB_TOKEN
