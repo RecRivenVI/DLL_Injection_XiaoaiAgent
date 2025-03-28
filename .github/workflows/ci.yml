@@ -13,27 +13,33 @@ jobs:
     runs-on: windows-latest
 
     steps:
+
       - name: Checkout code
         uses: actions/checkout@v3
+
 
       - name: Install Chocolatey
         run: |
           Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
 
       - name: Install MinGW-w64 and CMake
         run: |
           choco install mingw -y
           choco install cmake -y
 
+
       - name: Add MinGW to PATH
         run: |
           echo "C:\ProgramData\chocolatey\bin" >> $env:GITHUB_PATH
           echo "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin" >> $env:GITHUB_PATH
 
+
       - name: Verify GCC and CMake installation
         run: |
           gcc --version
           cmake --version
+
 
       - name: Configure CMake
         run: |
@@ -41,10 +47,12 @@ jobs:
           cd build
           cmake .. -G "MinGW Makefiles"
 
+
       - name: Build project
         run: |
           cd build
           mingw32-make
+
 
       - name: Package executable
         run: |
@@ -53,37 +61,21 @@ jobs:
           cp DLL_Injection_XiaoaiAgent.exe ../release/
         shell: bash
 
-      - name: Check if Release Tag Exists
-        id: check_tag
-        run: |
-          if (git rev-parse ${{ github.event.inputs.release_tag }} >/dev/null 2>&1); then
-            echo "tag_exists=true" >> $GITHUB_ENV
-          else
-            echo "tag_exists=false" >> $GITHUB_ENV
-          fi
 
       - name: Create Release
         id: create_release
-        if: env.tag_exists == 'false'
         uses: actions/create-release@v1
-        with:
-          tag_name: ${{ github.event.inputs.release_tag }}
-          release_name: Release ${{ github.event.inputs.release_tag }}
+@@ -71,13 +62,14 @@
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}  # Use PAT instead of default GITHUB_TOKEN
 
-      - name: Update Release
-        id: update_release
-        if: env.tag_exists == 'true'
-        run: |
-          echo "The release tag already exists. Updating the existing release."
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url || steps.update_release.outputs.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./release/DLL_Injection_XiaoaiAgent.exe
           asset_name: DLL_Injection_XiaoaiAgent.exe
           asset_content_type: application/octet-stream
