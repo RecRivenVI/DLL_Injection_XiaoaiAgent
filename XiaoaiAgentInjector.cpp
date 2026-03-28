@@ -35,16 +35,16 @@ std::string GetCurrentModuleDir() {
 
 int main() {
     // 设置控制台标题，方便用户识别
-    SetConsoleTitleA("XiaoaiAgent Loader");
+    SetConsoleTitleA("XiaoaiAgent Injector");
 
-    // A. 确定要注入的 .dat 文件路径 (假设叫 InternalCore.dat)
-    std::string dllName = "InternalCore.dat"; 
+    // A. 确定要注入的 .dat 文件路径 (假设叫 XiaoaiHelper.dat)
+    std::string dllName = "XiaoaiHelper.dat"; 
     std::string dllAbsolutePath = GetCurrentModuleDir() + "\\" + dllName;
 
     // 检查文件是否存在
     DWORD dwAttrib = GetFileAttributesA(dllAbsolutePath.c_str());
     if (dwAttrib == INVALID_FILE_ATTRIBUTES || (dwAttrib & FILE_ATTRIBUTE_DIRECTORY)) {
-        MessageBoxA(NULL, "错误：在当前目录下未找到 InternalCore.dat 文件！你需要从 dll 作者 ChsBuffer 处获取最新的 msimg32.dll，将其重命名为 InternalCore.dat 并放置于当前目录！", "启动失败", MB_ICONERROR);
+        MessageBoxA(NULL, "错误：在当前目录下未找到 XiaoaiHelper.dat 文件！你需要从 dll 作者 ChsBuffer 处获取最新的 msimg32.dll，将其重命名为 XiaoaiHelper.dat 并放置于当前目录！", "启动失败", MB_ICONERROR);
         return 1;
     }
 
