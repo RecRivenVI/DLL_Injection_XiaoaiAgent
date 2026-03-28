@@ -1,2 +1,38 @@
-// resource.rc
-IDI_ICON1 ICON "X.ico"
+#include <windows.h>
+
+// 1. 图标定义 (放在最前面)
+IDI_ICON1 ICON "XiaoaiAgent.ico"
+
+// 2. 版本信息定义
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     2,1,0,331
+PRODUCTVERSION  2,1,0,331
+FILEFLAGSMASK   0x3fL
+FILEFLAGS       0x0L
+FILEOS          0x40004L
+FILETYPE        0x1L
+FILESUBTYPE     0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        // 080404b0 代表 简体中文/Unicode
+        BLOCK "080404b0"
+        BEGIN
+            // --- 你需要的扩展字段 ---
+            VALUE "CompanyName",      "RavenYin\0"
+            VALUE "ProductName",      "XiaoaiAgent Injector\0"
+            VALUE "FileDescription",  "XiaoaiAgent Injector\0"
+            // ------------------------
+            
+            VALUE "FileVersion",      "2.1.0.331\0"
+            VALUE "InternalName",     "XiaoaiAgentInjector.exe\0"
+            VALUE "LegalCopyright",   "Copyright (C) 2026\0"
+            VALUE "OriginalFilename", "XiaoaiAgentInjector.exe\0"
+            VALUE "ProductVersion",   "2.1.0.331\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 1200
+    END
+END
