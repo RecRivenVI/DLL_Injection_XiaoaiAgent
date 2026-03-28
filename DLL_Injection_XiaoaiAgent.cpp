@@ -49,7 +49,7 @@ int main() {
     // 获取可执行文件所在的目录
     std::string dllDir = GetExecutableDirectory();
     // 构建DLL路径
-    std::string dllPath = dllDir + "\\wtsapi32.dll";
+    std::string dllPath = dllDir + "\\msimg32.dll";
 
     // 检查DLL文件是否存在
     if (!FileExists(dllPath)) {
