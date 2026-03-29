@@ -44,7 +44,7 @@ int main() {
     // 检查文件是否存在
     DWORD dwAttrib = GetFileAttributesA(dllAbsolutePath.c_str());
     if (dwAttrib == INVALID_FILE_ATTRIBUTES || (dwAttrib & FILE_ATTRIBUTE_DIRECTORY)) {
-        MessageBoxA(NULL, "错误：在当前目录下未找到 XiaoaiHelper.dat 文件！你需要从 dll 作者 ChsBuffer 处获取最新的 msimg32.dll，将其重命名为 XiaoaiHelper.dat 并放置于当前目录！", "启动失败", MB_ICONERROR);
+        MessageBoxA(NULL, "错误：在当前目录下未找到 XiaoaiHelper.dat 文件！你需要从 DLL 作者 ChsBuffer 处获取最新的 msimg32.dll，将其重命名为 XiaoaiHelper.dat 并放置于当前目录！", "注入失败", MB_ICONERROR);
         return 1;
     }
 
@@ -53,7 +53,7 @@ int main() {
     std::string installPath = GetExecutablePathFromRegistry(regSubKey, "Path");
     
     if (installPath.empty()) {
-        MessageBoxA(NULL, "错误：未能从小爱注册表获取安装路径，请检查程序是否安装。", "启动失败", MB_ICONERROR);
+        MessageBoxA(NULL, "错误：未能从小爱注册表获取安装路径，请检查程序是否安装！", "注入失败", MB_ICONERROR);
         return 1;
     }
     std::string exePath = installPath + "\\XiaoaiAgent.exe";
