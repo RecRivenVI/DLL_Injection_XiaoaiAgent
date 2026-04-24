@@ -1,7 +1,6 @@
 #include "InjectorCore.h"
 
-int main()
-{
+int main() {
     return RunInjector(
         "XiaomiAICreator Injector",
         "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\XiaomiAICreatorClient.exe",
