@@ -72,7 +72,7 @@ inline int RunInjector(const std::string &consoleTitle, const std::string &regSu
 
     std::cout << "[+] Launching: " << exePath << std::endl;
 
-    if (!CreateProcessA(NULL, (LPSTR)exePath.c_str(), NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &si, &pi))
+    if (!CreateProcessA(exePath.c_str(), NULL, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &si, &pi))
     {
         std::cerr << "[-] CreateProcess Failed. Error: " << GetLastError() << std::endl;
         return 1;
