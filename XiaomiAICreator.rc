@@ -1,0 +1,33 @@
+#pragma code_page(65001)
+#include <windows.h>
+
+IDI_ICON1 ICON "XiaomiAICreator.ico"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     1,3,0,179
+PRODUCTVERSION  1,3,0,179
+FILEFLAGSMASK   0x3fL
+FILEFLAGS       0x0L
+FILEOS          0x40004L
+FILETYPE        0x1L
+FILESUBTYPE     0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080404b0"
+        BEGIN
+            VALUE "CompanyName",      "RavenYin\0"
+            VALUE "ProductName",      "XiaomiAICreator Injector\0"
+            VALUE "FileDescription",  "DLL Injector for XiaomiAICreator\0"
+            VALUE "FileVersion",      "1.3.0.179\0"
+            VALUE "InternalName",     "XiaomiAICreatorInjector\0"
+            VALUE "LegalCopyright",   "Copyright (C) 2026 RavenYin. Licensed under MIT.\0"
+            VALUE "OriginalFilename", "XiaomiAICreatorInjector.exe\0"
+            VALUE "ProductVersion",   "1.3.0.179\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 1200
+    END
+END
