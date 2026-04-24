@@ -16,14 +16,35 @@ inline std::string GetExecutablePathFromRegistry(const std::string &subKey, cons
 
     char buffer[MAX_PATH];
     DWORD bufferSize = sizeof(buffer);
-    if (RegQueryValueExA(hKey, valueName.c_str(), NULL, NULL, (LPBYTE)buffer, &bufferSize) != ERROR_SUCCESS)
+    DWORD valueType = 0;
+    if (RegQueryValueExA(hKey, valueName.c_str(), NULL, &valueType, reinterpret_cast<LPBYTE>(buffer), &bufferSize) != ERROR_SUCCESS)
     {
         RegCloseKey(hKey);
         return "";
     }
 
+    if (valueType != REG_SZ && valueType != REG_EXPAND_SZ)
+    {
+        RegCloseKey(hKey);
+        return "";
+    }
+
+    if (bufferSize == 0)
+    {
+        RegCloseKey(hKey);
+        return "";
+    }
+
+    size_t stringLength = (bufferSize < sizeof(buffer)) ? static_cast<size_t>(bufferSize) : (sizeof(buffer) - 1);
+    buffer[stringLength] = '\0';
+
+    if (stringLength > 0 && buffer[stringLength - 1] == '\0')
+    {
+        --stringLength;
+    }
+
     RegCloseKey(hKey);
-    return std::string(buffer);
+    return std::string(buffer, stringLength);
 }
 
 // 获取当前注入器自己所在的目录
