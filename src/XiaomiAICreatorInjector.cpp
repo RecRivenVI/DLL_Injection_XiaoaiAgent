@@ -1,4 +1,4 @@
-#include "InjectorCore.h"
+#include "../include/InjectorCore.h"
 
 int main() {
     return RunInjector(
