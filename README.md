@@ -1,86 +1,85 @@
-# DLL Injector for XiaoaiAgent & XiaomiAICreator
+# DLL Injector —— 小爱同学 & 小米AI创作 注入器
 
-A lightweight Windows DLL injection utility that injects `msimg32.dll` into the **XiaoaiAgent (PC 版小爱同学)** and **XiaomiAICreator (小米AI创作)** processes. The injector uses classic `CreateProcess` + `CreateRemoteThread` + `LoadLibrary` injection technique.
+一个轻量级的 Windows DLL 注入工具，用于将 `msimg32.dll` 注入到 **PC 版小爱同学** 和 **小米AI创作 PC 版** 进程中。采用经典的 `CreateProcess` + `CreateRemoteThread` + `LoadLibrary` 注入技术实现。
 
-> This project is for educational and research purposes only.
+> 本项目仅供学习和研究参考，请勿用于非法用途。
 
-## Features
+## 功能特点
 
-- **Two injectors in one project** — targets both XiaoaiAgent and XiaomiAICreator
-- **Registry-based target discovery** — automatically locates the target application from Windows registry (`App Paths`)
-- **Minimal and clean codebase** — core injection logic in a single header file
-- **Static linking** — standalone executables with no runtime dependencies
-- **Embedded metadata** — version info and custom icons via Windows resource files
-- **No admin required** — runs at user privilege level for per-user installations
+- **双注入器合一** — 同时支持小爱同学和小米AI创作两个目标程序
+- **注册表路径自动发现** — 从 Windows 注册表 (`App Paths`) 自动定位目标程序安装位置
+- **极简代码** — 核心注入逻辑全部封装在单个头文件中，易于理解和修改
+- **静态链接** — 生成的独立可执行文件无运行时依赖
+- **嵌入元数据** — 通过 Windows 资源文件嵌入版本信息与自定义图标
+- **无需管理员权限** — 用户权限即可运行（适用于当前用户安装的程序）
 
-## How It Works
+## 工作原理
 
-1. The injector reads the target application's install path from the registry at `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\<AppName>.exe`
-2. It launches the target process in a **suspended state** (`CREATE_SUSPENDED`)
-3. It allocates memory in the target process via `VirtualAllocEx`
-4. It writes the full path of `msimg32.dll` into that memory
-5. It creates a remote thread that calls `LoadLibraryA` with the DLL path as argument, forcing the target to load the DLL
-6. After a short wait (3s), it resumes the target process's main thread
+1. 注入器从注册表 `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\<程序名>.exe` 读取目标程序安装路径
+2. 以**挂起状态** (`CREATE_SUSPENDED`) 启动目标进程
+3. 通过 `VirtualAllocEx` 在目标进程中分配内存
+4. 将 `msimg32.dll` 的完整路径写入该内存
+5. 创建远程线程，以 DLL 路径为参数调用 `LoadLibraryA`，强制目标进程加载 DLL
+6. 等待 3 秒后恢复目标进程主线程执行
 
-The `msimg32.dll` must be placed in the **same directory** as the injector executable. The DLL itself is not included in this repository.
+`msimg32.dll` 必须放置在注入器可执行文件的**同级目录**下。本仓库不包含该 DLL 文件。
 
-## Project Structure
+## 项目结构
 
 ```
 .
 ├── src/
-│   ├── XiaoaiAgentInjector.cpp      # Entry point for XiaoaiAgent injector
-│   └── XiaomiAICreatorInjector.cpp  # Entry point for XiaomiAICreator injector
+│   ├── XiaoaiAgentInjector.cpp      # 小爱同学注入器入口
+│   └── XiaomiAICreatorInjector.cpp  # 小米AI创作注入器入口
 ├── include/
-│   └── InjectorCore.h               # Core injection logic (header-only)
+│   └── InjectorCore.h               # 核心注入逻辑（头文件）
 ├── resources/
-│   ├── XiaoaiAgent.ico              # Icon for XiaoaiAgent injector
-│   ├── XiaoaiAgent.rc               # Resource script with VERSIONINFO
-│   ├── XiaomiAICreator.ico          # Icon for XiaomiAICreator injector
-│   └── XiaomiAICreator.rc           # Resource script with VERSIONINFO
-├── build.ps1                        # PowerShell build script (MinGW)
-├── LICENSE                          # MIT License
-└── README.md                        # This file
+│   ├── XiaoaiAgent.ico              # 小爱同学注入器图标
+│   ├── XiaoaiAgent.rc               # 小爱同学资源脚本（含版本信息）
+│   ├── XiaomiAICreator.ico          # 小米AI创作注入器图标
+│   └── XiaomiAICreator.rc           # 小米AI创作资源脚本（含版本信息）
+├── build.ps1                        # PowerShell 编译脚本
+├── LICENSE                          # MIT 许可证
+└── README.md                        # 说明文档
 ```
 
-## Prerequisites
+## 编译方法
 
-- **MinGW-w64** (with `g++` and `windres`) — install via [MSYS2](https://www.msys2.org/) or a MinGW-w64 toolchain of your choice
-- **Windows SDK** — headers are included with MinGW-w64
-- **msimg32.dll** — obtain from the DLL author (ChsBuffer). Place it next to the injector executable.
+### 环境要求
 
-## Building
+- **MinGW-w64**（含 `g++` 和 `windres`）— 通过 [MSYS2](https://www.msys2.org/) 或其他 MinGW-w64 工具链安装
+- **Windows SDK** — MinGW-w64 已自带所需头文件
+- **msimg32.dll** — 请向 DLL 作者 ChsBuffer 获取，并放置于注入器同级目录
 
-Open a PowerShell terminal and run:
+### 编译步骤
+
+打开 PowerShell 终端并运行：
 
 ```powershell
 .\build.ps1
 ```
 
-This will produce two executables:
-- `XiaoaiAgentInjector.exe`
-- `XiaomiAICreatorInjector.exe`
+编译完成后会生成两个可执行文件：
+- `XiaoaiAgentInjector.exe` — 小爱同学注入器
+- `XiaomiAICreatorInjector.exe` — 小米AI创作注入器
 
-### Build Flags
+### 编译选项说明
 
-The build script uses the following flags:
-- `-static -static-libgcc -static-libstdc++` — statically link runtime libraries for standalone executables
-- `-mwindows` — Windows subsystem (no console window by default)
-- `-luser32` — link against `user32` for message boxes
-- `-finput-charset=UTF-8 -fexec-charset=GBK` — UTF-8 source, GBK executable encoding for Chinese text
+- `-static -static-libgcc -static-libstdc++` — 静态链接运行时库，生成独立可执行文件
+- `-mwindows` — Windows 子系统（默认不显示控制台窗口）
+- `-luser32` — 链接 `user32` 库以支持消息弹窗
+- `-finput-charset=UTF-8 -fexec-charset=GBK` — 源代码 UTF-8 编码，生成 GBK 编码的可执行文件（确保中文正常显示）
 
-## Usage
+## 使用方法
 
-1. Place `msimg32.dll` in the same directory as the injector executable
-2. Run the injector. The target application will launch automatically with the DLL injected
-3. If `msimg32.dll` is missing, the injector will show an error message
+1. 将 `msimg32.dll` 放入注入器可执行文件的同级目录
+2. 直接运行注入器，目标程序将自动启动并完成 DLL 注入
+3. 如果缺少 `msimg32.dll`，注入器会弹出错误提示
 
-> **Note:** The target application must be installed for the registry path to exist. Per-user installations of XiaoaiAgent may require running the injector as the same user.
+> **注意：** 目标程序必须已安装，注册表路径才存在。如果小爱同学是当前用户安装的，请以相同用户身份运行注入器。
 
-## License
+## 许可证
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+本项目基于 MIT 许可证发布。详见 [LICENSE](LICENSE) 文件。
 
-## Author
 
-**RavenYin** — Copyright (c) 2026
