@@ -1,5 +1,12 @@
 # AGENTS.md
 
+## 全局注意事项
+
+- **提交规范**：所有提交必须遵循 Conventional Commits（type(scope): 中文描述，scope 使用英文模块名），提交标题需概括所有变更中的重点变更，正文需列出所有变动文件（同类文件可合并列举）并说明大致修改内容。
+  - **SSH 签名**：提交必须使用 SSH 密钥签名（`--gpg-sign=~/.ssh/id_ed25519.pub`）。
+  - **保留时间戳**：rebase/squash 时使用 `--committer-date-is-author-date` 参数，确保 Committer Date 与 Author Date 一致。
+  - **签名验证**：`git verify-commit` 因环境缺少 `gpg.ssh.allowedSignersFile` 会报错属正常现象，只要 commit object 中包含 `gpgsig` 字段即视为已签名。
+
 ## 构建
 
 - `pwsh build.ps1` — 需要 **MinGW-w64**（`g++`、`windres`），不能使用 MSVC。
@@ -27,7 +34,3 @@
 ## 缺失项
 
 - 无测试、无 CI、无 lint/typecheck 配置。这是一个小型的 Windows 仅限实用工具项目。
-
-## 提交规范
-
-所有提交必须遵循 Conventional Commits（`type(scope): 中文描述`，scope 使用英文模块名），提交标题需概括所有变更中的重点变更，正文需列出所有变动文件（同类文件可合并列举）并说明大致修改内容，保留原始 Author Date 且 Committer Date 须与其一致（不因 rebase/squash 重写时间），所有提交必须使用 SSH 签名。
